@@ -1,0 +1,17 @@
+---
+- name: Collect facts about application. CHD requirement,
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Get info about applications installed.
+      win_shell: |
+        $Packages = Get-Package -AllVersions -Force -IncludeWindowsInstaller | Select-Object -Property Name, Version
+        foreach ($Package in $Packages) {
+        $list = "Application: " + $Package.Name + " - Version: " + $Package.Version
+        Write-Output $list
+        }
+      register: softlist
+    - name: Create facts
+      set_fact:
+        Installed_programs: "{{ softlist.stdout_lines }}"
+        cacheable: yes
