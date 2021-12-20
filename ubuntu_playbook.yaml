@@ -1,13 +1,18 @@
 ---
-- name: Gather the package facts
-  ansible.builtin.package_facts:
-    manager: auto
+- hosts: all
+  gather_facts: yes
 
-- name: Print the package facts
-  ansible.builtin.debug:
-    var: ansible_facts.packages
+  tasks:  
+    - name: "Check if NGINX is installed"
+      package_facts:
+        manager: "auto"
 
-- name: Check whether a package called foobar is installed
-  ansible.builtin.debug:
-    msg: "{{ ansible_facts.packages['log4j'] | length }} versions of log4j are installed!"
-  when: "'log4j' in ansible_facts.packages"
+    - name: "log4j test result"
+      debug: 
+        msg: "log4j found"
+      when: "'log4j' in ansible_facts.packages"
+
+    - name: "log4j test result"
+      debug: 
+        msg: "log4j NOT found"
+      when: "'log4j' not in ansible_facts.packages"
