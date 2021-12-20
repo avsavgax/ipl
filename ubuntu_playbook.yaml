@@ -1,17 +1,13 @@
 ---
-- name: Collect facts about application. CHD requirement,
-  hosts: all
-  gather_facts: no
-  tasks:
-    - name: Get info about applications installed.
-      win_shell: |
-        $Packages = Get-Package -AllVersions -Force -IncludeWindowsInstaller | Select-Object -Property Name, Version
-        foreach ($Package in $Packages) {
-        $list = "Application: " + $Package.Name + " - Version: " + $Package.Version
-        Write-Output $list
-        }
-      register: softlist
-    - name: Create facts
-      set_fact:
-        Installed_programs: "{{ softlist.stdout_lines }}"
-        cacheable: yes
+- name: Gather the package facts
+  ansible.builtin.package_facts:
+    manager: auto
+
+- name: Print the package facts
+  ansible.builtin.debug:
+    var: ansible_facts.packages
+
+- name: Check whether a package called foobar is installed
+  ansible.builtin.debug:
+    msg: "{{ ansible_facts.packages['log4j'] | length }} versions of log4j are installed!"
+  when: "'log4j' in ansible_facts.packages"
